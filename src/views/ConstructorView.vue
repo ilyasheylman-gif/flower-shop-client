@@ -30,6 +30,7 @@ const search = ref('')
 
 const calc = ref(null) // ответ POST /custom-bouquets/calculate
 const calcLoading = ref(false)
+const calcError = ref('') // ошибка расчёта цены — показывается в панели
 const saving = ref(false)
 const errorMessage = ref('')
 const problems = ref([])
@@ -40,6 +41,8 @@ const items = computed(() =>
     .filter(([, q]) => q > 0)
     .map(([flowerId, quantity]) => ({ flower_id: Number(flowerId), quantity })),
 )
+const MAX_KINDS = 15 // столько разных цветов принимает API (items max:15)
+const kindsLimitReached = computed(() => items.value.length >= MAX_KINDS)
 const totalStems = computed(() => items.value.reduce((s, i) => s + i.quantity, 0))
 
 const visibleFlowers = computed(() =>
@@ -58,11 +61,20 @@ const selectedColors = computed(() =>
 const packaging = computed(() => dict.packagings.find((p) => p.id === packagingId.value))
 
 function change(flower, delta) {
+  if (delta > 0 && !quantities[flower.id] && kindsLimitReached.value) {
+    toast.info(`В букете может быть не больше ${MAX_KINDS} разных цветов`)
+    return
+  }
   const next = Math.max(0, Math.min(flower.stock_quantity, (quantities[flower.id] || 0) + delta))
   quantities[flower.id] = next
 }
 
 function setQty(flower, value) {
+  if (!quantities[flower.id] && kindsLimitReached.value) {
+    toast.info(`В букете может быть не больше ${MAX_KINDS} разных цветов`)
+    quantities[flower.id] = 0
+    return
+  }
   const n = Math.max(0, Math.min(flower.stock_quantity, Math.floor(Number(value) || 0)))
   quantities[flower.id] = n
 }
@@ -71,14 +83,16 @@ function setQty(flower, value) {
 const recalc = debounce(async () => {
   if (!items.value.length || !packagingId.value) {
     calc.value = null
+    calcError.value = ''
     return
   }
   calcLoading.value = true
   try {
     calc.value = (await api.customBouquets.calculate({ packaging_id: packagingId.value, items: items.value })).data
+    calcError.value = ''
   } catch (e) {
     calc.value = null
-    toast.error(e.message)
+    calcError.value = e.message
   } finally {
     calcLoading.value = false
   }
@@ -120,7 +134,7 @@ async function save(thenToCart = false) {
     sessionStorage.removeItem(DRAFT_KEY)
 
     if (thenToCart) {
-      cart.add({ type: 'custom', id: saved.id, name: saved.name, price: saved.price, colors: selectedColors.value })
+      cart.add({ type: 'custom', id: saved.id, name: saved.name, price: saved.price, colors: selectedColors.value, packaging: packaging.value ? { type: packaging.value.type, color: packaging.value.color } : null })
       toast.success('Букет сохранён и добавлен в корзину')
       router.push({ name: 'cart' })
     } else {
@@ -196,6 +210,7 @@ onMounted(async () => {
             </div>
           </div>
 
+          <p class="muted small">Разных цветов в букете: {{ items.length }} / {{ MAX_KINDS }}</p>
           <div class="flowers">
             <div v-for="f in visibleFlowers" :key="f.id" class="flower" :class="{ picked: quantities[f.id] > 0, out: f.stock_quantity === 0 }">
               <span class="swatch" :style="{ background: colorHex(f.color) }"></span>
@@ -206,7 +221,7 @@ onMounted(async () => {
               <div class="counter">
                 <button type="button" class="icon-btn" :disabled="!quantities[f.id]" @click="change(f, -1)">−</button>
                 <input :value="quantities[f.id] || 0" type="number" min="0" :max="f.stock_quantity" @change="setQty(f, $event.target.value)" />
-                <button type="button" class="icon-btn" :disabled="f.stock_quantity === 0 || quantities[f.id] >= f.stock_quantity" @click="change(f, 1)">+</button>
+                <button type="button" class="icon-btn" :disabled="f.stock_quantity === 0 || quantities[f.id] >= f.stock_quantity || (!quantities[f.id] && kindsLimitReached)" @click="change(f, 1)">+</button>
               </div>
             </div>
             <p v-if="!visibleFlowers.length" class="muted">Нет цветов по выбранным условиям.</p>
@@ -227,7 +242,7 @@ onMounted(async () => {
       </section>
 
       <aside class="card sticky stack summary">
-        <FlowerArt :colors="selectedColors" :seed="totalStems + 7" />
+        <FlowerArt :colors="selectedColors" :seed="totalStems + 7" :packaging="packaging" />
         <FormField label="Название" :error="fieldErrors.name">
           <input v-model="name" maxlength="100" :class="{ invalid: fieldErrors.name }" />
         </FormField>
@@ -236,6 +251,7 @@ onMounted(async () => {
         </FormField>
 
         <div v-if="!items.length" class="muted">Добавьте цветы, чтобы увидеть стоимость.</div>
+        <div v-else-if="calcError" class="alert alert-error small">{{ calcError }}</div>
         <template v-else-if="calc">
           <table class="small">
             <tbody>

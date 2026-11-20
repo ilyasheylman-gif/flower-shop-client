@@ -27,7 +27,7 @@ async function load() {
 const colorsOf = (b) => b.items.flatMap((i) => Array(Math.min(i.quantity, 3)).fill(i.flower.color))
 
 function addToCart(b) {
-  cart.add({ type: 'custom', id: b.id, name: b.name, price: b.price, colors: colorsOf(b) })
+  cart.add({ type: 'custom', id: b.id, name: b.name, price: b.price, colors: colorsOf(b), packaging: b.packaging ? { type: b.packaging.type, color: b.packaging.color } : null })
   toast.success(`«${b.name}» в корзине`)
 }
 
@@ -64,7 +64,7 @@ onMounted(load)
 
     <div v-else class="grid grid-3">
       <article v-for="b in bouquets" :key="b.id" class="card stack">
-        <FlowerArt :colors="colorsOf(b)" :seed="b.id + 100" />
+        <FlowerArt :colors="colorsOf(b)" :seed="b.id + 100" :packaging="b.packaging" />
         <div class="spread">
           <h3>{{ b.name }}</h3>
           <span v-if="b.is_ordered" class="badge status-delivered">Заказан</span>

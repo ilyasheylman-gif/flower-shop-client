@@ -166,7 +166,7 @@ onMounted(async () => {
             <div class="spread">
               <h3>Открытка</h3>
               <button v-if="canEditPostcard && !postcardForm.editing" class="btn btn-ghost btn-sm" @click="editPostcard">
-                {{ order.postcard ? 'Изменить' : 'Добавить (+100 ₽)' }}
+                {{ order.postcard ? 'Изменить' : 'Добавить (+500 ₸)' }}
               </button>
             </div>
             <template v-if="postcardForm.editing">

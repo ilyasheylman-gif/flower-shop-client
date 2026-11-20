@@ -9,9 +9,9 @@ import { useCartStore } from '@/stores/cart'
 import { useToastStore } from '@/stores/toast'
 import { isoDate, money, POSTCARD_DESIGNS } from '@/utils/format'
 
-const DELIVERY_PRICE = 400
-const FREE_DELIVERY_FROM = 5000
-const POSTCARD_PRICE = 100
+const DELIVERY_PRICE = 2000
+const FREE_DELIVERY_FROM = 30000
+const POSTCARD_PRICE = 500
 
 // Интервалы доставки (рабочее время 09:00–21:00)
 const SLOTS = ['09:00-11:00', '11:00-13:00', '13:00-15:00', '15:00-17:00', '17:00-19:00', '19:00-21:00']
@@ -128,7 +128,7 @@ async function generatePostcard() {
       <section class="stack">
         <div class="card">
           <div v-for="item in cart.items" :key="item.key" class="line">
-            <div class="thumb"><FlowerArt :colors="item.colors ?? []" :seed="item.id" :image="item.image" /></div>
+            <div class="thumb"><FlowerArt :colors="item.colors ?? []" :seed="item.id" :image="item.image" :packaging="item.packaging" /></div>
             <div class="grow">
               <strong>{{ item.name }}</strong>
               <div class="muted small">{{ item.type === 'custom' ? 'Индивидуальный букет' : 'Готовый букет' }} · {{ money(item.price) }}</div>

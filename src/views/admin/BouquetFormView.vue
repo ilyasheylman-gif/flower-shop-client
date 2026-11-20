@@ -163,7 +163,7 @@ onMounted(async () => {
       </div>
 
       <div class="form-grid">
-        <FormField label="Цена, ₽" :error="err('price')">
+        <FormField label="Цена, ₸" :error="err('price')">
           <input v-model="form.price" type="number" min="1" :class="{ invalid: err('price') }" />
         </FormField>
         <div class="field">

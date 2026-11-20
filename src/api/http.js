@@ -101,8 +101,11 @@ export async function request(path, { method = 'GET', body, query, form, auth401
         unauthorizedHandler?.()
       }
       throw new ApiError(message, 401)
-    case 422:
-      throw new ApiError(message, 422, data?.errors ?? {})
+    case 422: {
+      const errors = data?.errors ?? {}
+      const first = Object.values(errors).flat()[0]
+      throw new ApiError(first || message, 422, errors)
+    }
     default:
       if (response.status >= 500) {
         throw new ApiError('Ошибка сервера. Попробуйте позже.', response.status)

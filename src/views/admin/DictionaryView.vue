@@ -24,7 +24,7 @@ const CONFIG = {
       { key: 'name', label: 'Название', type: 'text', required: true },
       { key: 'type', label: 'Тип', type: 'select', options: PACKAGING_TYPES },
       { key: 'color', label: 'Цвет', type: 'text' },
-      { key: 'price', label: 'Цена, ₽', type: 'number' },
+      { key: 'price', label: 'Цена, ₸', type: 'number' },
       { key: 'max_flowers', label: 'Вместимость, цветов', type: 'number' },
       { key: 'is_active', label: 'Доступна', type: 'checkbox' },
     ],

@@ -23,11 +23,13 @@ export const useCartStore = defineStore('cart', () => {
   const count = computed(() => items.value.reduce((sum, i) => sum + i.quantity, 0))
   const total = computed(() => items.value.reduce((sum, i) => sum + i.price * i.quantity, 0))
 
-  /** @param {{type: 'bouquet'|'custom', id: number, name: string, price: number, colors?: string[], image?: string}} product */
+  /** @param {{type: 'bouquet'|'custom', id: number, name: string, price: number, colors?: string[], image?: string, packaging?: {type: string, color: string}|null}} product */
   function add(product, quantity = 1) {
     const key = `${product.type}-${product.id}`
     const existing = items.value.find((i) => i.key === key)
     if (existing) {
+      // букет могли пересобрать (другая упаковка, состав, цена) — обновляем данные позиции
+      Object.assign(existing, { ...product, key, quantity: existing.quantity })
       existing.quantity = Math.min(20, existing.quantity + quantity)
     } else {
       items.value.push({ ...product, key, quantity })

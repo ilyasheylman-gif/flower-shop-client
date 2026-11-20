@@ -1,6 +1,6 @@
 const moneyFormatter = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 })
 
-export const money = (value) => `${moneyFormatter.format(Number(value || 0))} ₽`
+export const money = (value) => `${moneyFormatter.format(Number(value || 0))} ₸`
 
 export const date = (value) =>
   value ? new Date(value.length === 10 ? `${value}T00:00:00` : value).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : '—'

@@ -135,7 +135,7 @@ onMounted(() => {
         <span class="chip">ИИ-помощник</span>
       </div>
       <form class="row" @submit.prevent="suggest">
-        <input v-model="aiQuery" placeholder="Например: на юбилей маме, любит пастельные тона, до 5000 рублей" class="grow" />
+        <input v-model="aiQuery" placeholder="Например: на юбилей маме, любит пастельные тона, до 30 000 тенге" class="grow" />
         <button class="btn" :disabled="aiLoading">{{ aiLoading ? 'Подбираем…' : 'Подобрать' }}</button>
       </form>
       <p v-if="aiError" class="alert alert-error small">{{ aiError }}</p>
@@ -180,7 +180,7 @@ onMounted(() => {
           </select>
         </label>
         <div class="field">
-          <span>Цена, ₽</span>
+          <span>Цена, ₸</span>
           <div class="row nowrap">
             <input v-model="filters.price_min" type="number" min="0" step="100" placeholder="от" />
             <input v-model="filters.price_max" type="number" min="0" step="100" placeholder="до" :class="{ invalid: fieldErrors.price_max }" />
@@ -210,7 +210,7 @@ onMounted(() => {
         </div>
 
         <PaginationBar :meta="meta" @change="goToPage" />
-        <p v-if="meta" class="muted small center">Доставка — {{ money(400) }}, бесплатно от {{ money(5000) }}</p>
+        <p v-if="meta" class="muted small center">Доставка — {{ money(2000) }}, бесплатно от {{ money(30000) }}</p>
       </section>
     </div>
   </div>

@@ -130,7 +130,7 @@ onMounted(load)
             <option v-for="(c, key) in COLORS" :key="key" :value="key">{{ c.label }}</option>
           </select>
         </FormField>
-        <FormField label="Цена за шт., ₽" :error="formErrors.price"><input v-model="form.price" type="number" min="1" :class="{ invalid: formErrors.price }" /></FormField>
+        <FormField label="Цена за шт., ₸" :error="formErrors.price"><input v-model="form.price" type="number" min="1" :class="{ invalid: formErrors.price }" /></FormField>
         <FormField v-if="!form.id" label="Начальный остаток" :error="formErrors.stock_quantity"><input v-model="form.stock_quantity" type="number" min="0" /></FormField>
       </div>
       <FormField label="Описание" :error="formErrors.description"><textarea v-model="form.description" rows="2"></textarea></FormField>
